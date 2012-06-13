@@ -1,0 +1,15 @@
+{
+	"name":"beam",
+	"type":"action",
+	"comment":"Set P.x and P.y afterwards for relative position,\nmultiply V.y by -1 to reverse direction",
+	"spriteset":"b-beam.rss",
+	"offset":1,
+	"p":{"x":0,"y":0,"z":0},
+	"s":{"x":0,"y":0,"z":0,"rx":0,"ry":0,"rz":0},
+	"v":{"x":0,"y":128,"z":0,"rx":0,"ry":0,"rz":0},
+	"a":{"x":0,"y":0,"z":0,"rx":0,"ry":0,"rz":0},
+	"spawn":1,
+	"limit":10,
+	"life":2000,
+	"rate":250
+}

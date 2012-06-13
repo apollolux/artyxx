@@ -1,0 +1,15 @@
+{
+	"name":"vulcan",
+	"type":"action",
+	"comment":"Set P.x and P.y afterwards for relative position,\nmultiply V.y by -1 to reverse direction,\nset acceleration optionally to non-zero",
+	"spriteset":"b-wh.rss",
+	"offset":1,
+	"p":{"x":0,"y":0,"z":0},
+	"s":{"x":0,"y":0,"z":0,"rx":10,"ry":10,"rz":0},
+	"v":{"x":0,"y":128,"z":0,"rx":64,"ry":0,"rz":0},
+	"a":{"x":0,"y":0,"z":0,"rx":0,"ry":0,"rz":0},
+	"spawn":1,
+	"limit":100,
+	"life":[1750,500],
+	"rate":40
+}
