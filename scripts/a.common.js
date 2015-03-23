@@ -1,7 +1,7 @@
 /****
 COMMON
 ****/
-RequireSystemScript("json2.js");
+RequireScript("json2.js");
 
 Array.prototype.find = function(f, value) {
 	var i = this.length; while (--i>-1) {if (f(this[i])===value) return i;}
@@ -64,7 +64,7 @@ var App = (function(){
 	_is["file"] = function(o){return _is['object'](o)&&o.toString()==='[object file]';};
 	//// PROC
 	_f["keyString"] = function(k,s){
-		var r = GetKeyString(k,s);
+		var r = GetKeyString(k,s!==undefined?s:false);
 		if (!r) switch (k) {
 			case KEY_UP: r = "[U]"; break;
 			case KEY_DOWN: r = "[D]"; break;
@@ -435,7 +435,7 @@ var App = (function(){
 	};
 	_f["layerRenderer"] = function(m){
 		if (m in App.Common.Scrolls) {
-			SetLayerRenderer('Base','App.Common.bg.blit(0,0);App.F.blitScroll("'+m+'");');
+			SetLayerRenderer(0,'App.Common.bg.blit(0,0);App.F.blitScroll("'+m+'");');
 		}
 	};
 	_f["pollInput"] = function(ent){if(ent in App.Common.Entities&&App.Common.Entities[ent]){
