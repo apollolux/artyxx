@@ -333,6 +333,7 @@ function _newgame() {
 	//SetUpdateScript();
 	App.Common.msgQ.push({msg:"Take off every Artyxx!",time:2000});
 	SetDefaultMapScript(SCRIPT_ON_ENTER_MAP,"App.F.enter();");
+	BindKey(App.Keyset.bail, "", "App.F.exitToMain();");
 	MapEngine(curmap,60);
 }
 
