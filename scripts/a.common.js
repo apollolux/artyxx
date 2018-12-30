@@ -23,7 +23,7 @@ var App = (function(){
 		"Green":CreateColor(0,255,0,255),
 		"Blue":CreateColor(0,0,255,255)
 	};
-	var _f = {}, _fl = {"debug":0,"updatePersonList":1}, _is = {};
+	var _f = {}, _fl = {"debug":4,"updatePersonList":1}, _is = {};
 	var _k = {
 		'm':GetPlayerKey(PLAYER_1,PLAYER_KEY_MENU),
 		'u':GetPlayerKey(PLAYER_1,PLAYER_KEY_UP),
@@ -33,7 +33,8 @@ var App = (function(){
 		'a':GetPlayerKey(PLAYER_1,PLAYER_KEY_A),
 		'b':GetPlayerKey(PLAYER_1,PLAYER_KEY_B),
 		'x':GetPlayerKey(PLAYER_1,PLAYER_KEY_X),
-		'y':GetPlayerKey(PLAYER_1,PLAYER_KEY_Y)
+		'y':GetPlayerKey(PLAYER_1,PLAYER_KEY_Y),
+		'tick':KEY_TILDE
 	};
 	//Abort(GetKeyString(_k['a'],false));
 	var _img = {}, _fon = {}, _snd = {}, _spr = {};
@@ -138,22 +139,29 @@ var App = (function(){
 		return r;
 	};
 	_f["enter"] = function(){
+		var SH = App.Screen.height;
 		App.Common.Time.start = GetTime();
 		var __cm,__pn='artyxx',__pl=GetPersonLayer(__pn),__bl=GetPersonLayer("barrier-h_0");
 		if (IsMapEngineRunning()) {
 			if (__pl!==__bl) {SetPersonLayer(__pn, __bl); __pl = __bl;}
-			__cm = GetCurrentMap();
-			App.Common.Entities[__pn].x = MapToScreenX(__pl,GetPersonX(__pn));
-			App.Common.Entities[__pn].y = MapToScreenY(__pl,GetPersonY(__pn));
-			App.F.layerRenderer(__cm);
+			var th = GetTileHeight();
 			App.Common.Camera = {
 				"x":0,
-				"y":GetLayerHeight(0)*GetTileHeight()
+				"y":GetLayerHeight(0)*th
 			};
+			__cm = GetCurrentMap();
+			var px = GetPersonX(__pn),
+				py = GetPersonY(__pn);
+			var sy = MapToScreenY(__pl,py);
+			if (sy>SH || sy<0) py = th, SetPersonY(__pn, ScreenToMapY(__pl,py));
+			App.Common.Entities[__pn].x = MapToScreenX(__pl,px);
+			App.Common.Entities[__pn].y = MapToScreenY(__pl,py);
+			App.F.layerRenderer(__cm);
 		}
 		App.Common.Time.last = GetTime();
 		App.Common.Time.now = GetTime();
 		BindKey(KEY_P, "", "var __ss=GrabSurface(0,0,App.Screen.width,App.Screen.height);if(__ss.save('screenshot-'+(++App.Common.ssIndex)+'.png'))App.Common.msgQ.push({msg:'screenshot-'+App.Common.ssIndex+'.png saved',time:333});");
+		//BindKey(App.Keyset.bail, "", "App.F.exitToMain();");
 		SetUpdateScript("App.F.update();");
 		SetRenderScript("App.F.render();");
 	};
@@ -261,7 +269,7 @@ var App = (function(){
 		}
 		else {
 			App.Common.Camera.y = 0;
-			(function(en){
+			if ('gyrexx' in App.Common.Entities && App.Common.Entities['gyrexx']) (function(en){
 				//App.Common.msgQ.push({msg:"GY:"+en.mapY,time:16});
 				en.x += 0;
 				en.y += 0;
@@ -275,6 +283,8 @@ var App = (function(){
 		}
 	};
 	_f["exitToMain"] = function(){
+		var pl = GetPersonList();
+		for (var i=0, l=pl.length; i<l; ++i) DestroyPerson(pl[i]);
 		if (IsMapEngineRunning()) ExitMapEngine();
 	};
 	_f["processEntities"] = function(){
@@ -360,11 +370,13 @@ var App = (function(){
 			App.F.processCamera(__th);
 		}
 		App.F.pollInput(__p);
+		if (IsKeyPressed(App.Keyset.bail)) App.F.exitToMain();	// BAIL
 		App.F.processEntities();
 		App.F.processTriggers();
 	};
 	_f["render"] = function(){
-		var fh = App.Common.font.getHeight(), SW = App.Screen.width, SH = App.Screen.height, __cm, __pn = 'artyxx'; if (__pn in App.Common.Entities&&App.Common.Entities[__pn]) {
+		var fh = App.Common.font.getHeight(), SW = App.Screen.width, SH = App.Screen.height, __cm;
+		var __pn = 'artyxx'; if (__pn in App.Common.Entities&&App.Common.Entities[__pn]) {
 			(function(en){
 				en.render();
 				App.Common.font.drawText(240-fh,fh+fh+fh+4,"Shield");
@@ -377,6 +389,7 @@ var App = (function(){
 						GetPersonLayer(en.name)+','+
 						GetPersonDirection(en.name)
 				);
+				App.Common.font.drawText(240-fh, fh+fh+fh+fh+fh+fh+4, IsKeyPressed(App.Keyset.bail));
 				/*var _pmsg = "", em = en.emitters, ep;
 				var _ip, _ie = em.length; while (--_ie>-1) {
 					ep = em[_ie].children; _ip = ep.length; while (--_ip>-1) {
@@ -490,7 +503,8 @@ var App = (function(){
 			get cancel(){return _k['b'];},
 			get missile(){return _k['x'];},
 			get bomb(){return _k['y'];},
-			get menu(){return _k['m'];}
+			get menu(){return _k['m'];},
+			get bail(){return KEY_BACKSPACE;}
 		},
 		"Common":{},
 		get FPS(){var v=GetFrameRate();if(v<1)v=60;return 1/60;},
